@@ -10,7 +10,7 @@ Currently the programming framework is pretty much done, and all that remains is
 
 -----
 
-In the meantime, you can see a very barebones demonstration of the program running with only 11 weeks of data from 7 parishes fed into it:
+In the meantime, you can see a very barebones demonstration of the program running with only 7 parishes and only a few weeks of data provided:
 
 ![Prototype GIF](current_prototype.gif)
 
