@@ -16,5 +16,7 @@ In the meantime, you can see a very barebones demonstration of the program runni
 
 TODO:
  - Add the rest of the parish data
+ - Add a "Current Date" tracker (scrobbleable trackbar?)
  - Add some summary graphs with matplotlib detailing cumulative death tolls
  - Add alternate display modes (eg: count survivors instead of dead)
+ - Possibly try interpolating data for smoother animations
