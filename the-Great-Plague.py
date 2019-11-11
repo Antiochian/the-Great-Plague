@@ -6,26 +6,24 @@ Created on Mon Nov 11 02:39:06 2019
 @author: Antiochian
 
 The gameplan:
-    - Manually transcribe each parish's death count in a text file of format testParish.txt
-    - Manually draw map of 1664 London (with parish boundaries possibly OR overlay onto modern-day map)
-    - Manually transcribe polygon coordinates of each parish
-    - iterate over all 51 weeks
+    - Manually transcribe each parish's death count in a text file of format "totaldeaths plaguedeaths\n"
+    - Generate polygon vertex coordinates of each parish as a .txt file using ShapeJ "points" and "measure" tools
+    - Automatically convert these text files to polygon objects in pygame to be coloured
+    - iterate over all 51 weeks and colour each parish accordingly
     - Make parish a different colour of red for number of deaths (option to normalise with population of parish?)
-    - include total mortality counter on bottom of screen
+    - include total mortality counter on bottom of screen as some kind of neat graph perhaps
 """
 
-#dictionary format for Mortality Bills:
 import pygame
 import sys,os
-import csv
-
-rivercolor = (0,43,54)
+#color data
 rivercolor = (88,110,117)
 bgcolor = (7,54,66)
 lifecolor = (133,153,0,255)
 lifecolor = (0,0,0,255)
 deathcolor = (255,0,0,255)
 
+#this FPS is NOT the same FPS the animation runs at, its just to make inputs feel snappy
 FPS = 30
 animspeed = 1.7 #weeks/second
 
@@ -46,12 +44,12 @@ namelist = []
 class Parish:
     def __init__(self,name):
         self.name = name #eg: St Aldates
-        self.shape = import_shape('shapes/'+name)#eg: [ (10,20) , (10,30) , (15,42) ]
-        self.deathlist = import_deaths('deaths/'+name) #eg: [0,0,0,1,3,2,14,235,800,300,20,15, 0,..] each death by plague (total deaths?)
+        self.shape = import_shape('shapes/'+name)   #eg: [ (10,20) , (10,30) , (15,42) ]
+        self.deathlist = import_deaths('deaths/'+name)  #eg: [[0,0],[1,0],[3,2],[56,49], ...] each death by plague (total deaths?)
         #self.size = some sort of shoelace algorithm? #possibly might be used for normalising data?
         
 def import_shape(URL):
-    #reads given file path and outputs a 2-dimensional list of vertex coordinates
+    #reads given file path and outputs a 2-dimensional list of polygon vertex coordinates
     file = open(URL).read().splitlines()
     points = []
     for count in range(1,len(file)):
@@ -92,7 +90,7 @@ def draw_deaths(weekno):
         shade = (int(lifecolor[0]+dR*intensityfrac), int(lifecolor[1]+dG*intensityfrac),int(lifecolor[2]+dB*intensityfrac), 255)
         pygame.draw.polygon(deathlayer, shade, parishdict[name].shape)
     window.blit(deathlayer, (0,0))
-    window.blit(maplayer, (0,0))
+    window.blit(maplayer, (0,0)) #put map overtop
     pygame.display.update()
     return
 
@@ -101,15 +99,15 @@ window.fill(bgcolor)
 deathlayer.fill((0,0,0,0))
 create_parishes()
 
-maxdeaths = int(max(parishdict[namelist[0]].deathlist)[0])
+maxdeaths = int(max(parishdict[namelist[0]].deathlist)[0]) #normalise
 totalweeks = len(parishdict[namelist[0]].deathlist)
 weekno = 0
 framecount = 0
 draw_river()
 while True: #main simulation loop
-    clock.tick(FPS) #set framerate to 1 year every 10 seconds (36.5 days/second)
+    clock.tick(FPS)
     framecount += 1
-    if weekno < totalweeks and framecount % 17 == 0:
+    if weekno < totalweeks and framecount % 17 == 0: #modulo to make animation FPS seperate from actual program FPS
         draw_deaths(weekno) 
         weekno += 1   
     
@@ -117,7 +115,7 @@ while True: #main simulation loop
         if event.type == pygame.QUIT: #detect attempted exit
             pygame.quit()
             sys.exit()      #these 2 optional lines fix a hangup bug in IDLE  
-        if  pygame.key.get_pressed()[114]:
+        if  pygame.key.get_pressed()[114]: #R to reset
             weekno = 0
             framecout = 0
 
